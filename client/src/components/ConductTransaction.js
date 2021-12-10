@@ -1,6 +1,8 @@
+import { Button } from "react-bootstrap";
 import React, { Component } from "react";
 import { FormGroup, FormControl } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import history from "../history";
 
 class ConductTransaction extends Component {
   state = { recipient: "", amount: 0 };
@@ -11,6 +13,21 @@ class ConductTransaction extends Component {
 
   updateAmount = (event) => {
     this.setState({ amount: Number(event.target.value) });
+  };
+
+  conductTransaction = () => {
+    const { recipient, amount } = this.state;
+
+    fetch(`${document.location.origin}/api/transact`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ recipient, amount }),
+    })
+      .then((response) => response.json())
+      .then((json) => {
+        alert(json.message || json.type);
+        history.push("/transaction-pool");
+      });
   };
 
   render() {
@@ -34,6 +51,9 @@ class ConductTransaction extends Component {
             onChange={this.updateAmount}
           />
         </FormGroup>
+        <div>
+          <Button onClick={this.conductTransaction}>Submit</Button>
+        </div>
       </div>
     );
   }
